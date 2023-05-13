@@ -3,6 +3,6 @@ FROM golang:latest
 
 WORKDIR /app
 
-COPY ./PersonalWebsiteGo .
+COPY . .
 RUN go build -o app
 CMD ["./app"]

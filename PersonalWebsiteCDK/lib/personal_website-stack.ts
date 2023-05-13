@@ -21,7 +21,7 @@ export class PersonalWebsiteStack extends cdk.Stack {
     });
 
     // Add SSH rule to the security group
-    securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'Allow SSH access from the internet');
+    // securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'Allow SSH access from the internet');
 
     // Create an ECS cluster
     const cluster = new ecs.Cluster(this, 'MyCluster', {
@@ -44,7 +44,7 @@ export class PersonalWebsiteStack extends cdk.Stack {
     const container = taskDefinition.addContainer('MyContainer', {
       // load image from Dockerfile in root directory
       image: ecs.ContainerImage.fromAsset('../PersonalWebsiteGo'),
-      memoryLimitMiB: 512,
+      memoryLimitMiB: 256,
     });
 
     // Create a service to run the task definition
@@ -53,5 +53,28 @@ export class PersonalWebsiteStack extends cdk.Stack {
       taskDefinition: taskDefinition,
       securityGroups: [securityGroup],
     });
+
+    const keyPair = new ec2.CfnKeyPair(this, 'MyKeyPair', {
+      keyName: 'personal-website-bastion-key-pair',
+    });
+
+
+    const bastionHostSecurityGroup = new ec2.SecurityGroup(this, 'BastionHostSecurityGroup', {
+      vpc,
+      description: 'Allow SSH access to the bastion host',
+    });
+    bastionHostSecurityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(22), 'Allow SSH access from the internet');
+    const bastionHost = new ec2.Instance(this, 'BastionHost', {
+      vpc,
+      instanceType: new ec2.InstanceType('t3.nano'),
+      machineImage: new ec2.AmazonLinuxImage(),
+      securityGroup: bastionHostSecurityGroup,
+      keyName: keyPair.keyName,
+      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC }, // explicitly choosing public subnet
+    });
+    securityGroup.addIngressRule(bastionHostSecurityGroup, ec2.Port.tcp(22), 'Allow SSH access from the bastion host');
+
+
+
   }
 }
