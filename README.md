@@ -2,7 +2,7 @@
 
 This self contained project deploys a minimal set of AWS Infrastructure for hosting a personal website on an EC2 t2.nano instance with HTTPS. With the AWS free tier, hosting costs are around $40 per month.
 
-The demo Go server code is a simple example taken from the book *The Go Programming Language* by Alan A.A. Donovan and Brian W. Kernighan.
+The demo Go server code included is taken from the book *The Go Programming Language* by Alan A.A. Donovan and Brian W. Kernighan.
 
 ![Deployed Site](./Docs/demo.gif)
 
