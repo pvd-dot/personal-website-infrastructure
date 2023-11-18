@@ -1,12 +1,8 @@
 # Personal Website Infrastructure
 
-If you want to host a personal website on EC2, this is about the cheapest way to do it.
+This self contained project deploys a minimal set of AWS Infrastructure for hosting a personal website on an EC2 t2.nano instance with HTTPS. With the AWS free tier, hosting costs are around $40 per month.
 
-This self contained project deploys a minimal set of AWS Infrastructure for hosting a personal website on an EC2 t2.nano instance with HTTPS. 
-
-The included Go server code is a simple example from the book *The Go Programming Language* by Alan A.A. Donovan and Brian W. Kernighan. It returns a different animated [Lissajous figure](https://en.wikipedia.org/wiki/Lissajous_curve) on each request. 
-
-![Architecture](./Docs/architecture.png)
+The demo Go server code is a simple example taken from the book *The Go Programming Language* by Alan A.A. Donovan and Brian W. Kernighan.
 
 ![Deployed Site](./Docs/demo.gif)
 
