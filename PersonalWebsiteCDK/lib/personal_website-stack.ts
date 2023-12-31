@@ -118,5 +118,17 @@ export class PersonalWebsiteStack extends cdk.Stack {
       zone: props.hostedZone,
       target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(lb)),
     });
+
+    if (!process.env.PERSONAL_WEBSITE_DOMAIN_NAME) {
+      throw new Error('PERSONAL_WEBSITE_DOMAIN_NAME environment variable is not set');
+    }
+
+    const personalWebsiteDomainName = process.env.PERSONAL_WEBSITE_DOMAIN_NAME as string;
+
+    new route53.CnameRecord(this, 'CnameRecord', {
+      zone: props.hostedZone,
+      recordName: 'www',
+      domainName: personalWebsiteDomainName,
+    });
   }
 }

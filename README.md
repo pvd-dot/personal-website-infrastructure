@@ -2,7 +2,7 @@
 
 This self contained project deploys a minimal set of AWS Infrastructure for hosting a personal website on an EC2 t2.nano instance with HTTPS. With the AWS free tier, hosting costs are around $40 per month.
 
-The demo Go server code included is taken from the book *The Go Programming Language* by Alan A.A. Donovan and Brian W. Kernighan.
+The demo Go server code included is taken from the book *The Go Programming Language* by Alan Donovan and Brian Kernighan.
 
 ![Deployed Site](./Docs/demo.gif)
 
@@ -46,13 +46,35 @@ Before getting started, please ensure that you have the following software versi
 
 You will also need to have a [domain registered with AWS](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html).
 
-## Deployment
+## First time setup
+
+Install dependencies using:
+
+```
+npm install
+```
+
+Add environment variables to your shell profile:
 
 ```
 export CDK_DEFAULT_ACCOUNT=youraccountnumberhere
 export AWS_DEFAULT_REGION=us-west-2
 export PERSONAL_WEBSITE_DOMAIN_NAME=yourwebsitehere.com
-cdk deploy PersonalWebsiteStack
+```
+
+Set up your AWS credentials (see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+
+Build the project:
+
+```
+cd PersonalWebsiteCDK
+npm run build
+```
+
+## Deployment
+
+```
+AWS_PROFILE=your_profile cdk deploy PersonalWebsiteStack
 ```
 
 ### First time deployment only

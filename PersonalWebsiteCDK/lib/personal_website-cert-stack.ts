@@ -27,6 +27,7 @@ export class CertStack extends cdk.Stack {
 
     this.certificate = new certmgr.Certificate(this, 'PersonalWebsiteCertificate', {
       domainName: personalWebsiteDomainName,
+      subjectAlternativeNames: [`www.${personalWebsiteDomainName}`],
       certificateName: 'Personal Website',
       validation: certmgr.CertificateValidation.fromDns(this.hostedZone),
     });
