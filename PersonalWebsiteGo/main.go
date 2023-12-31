@@ -1,16 +1,21 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"image"
 	"image/color"
 	"image/color/palette"
 	"image/draw"
 	"image/gif"
 	"io"
-	"log"
 	"math"
 	"math/rand"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 // Minimal Golang webserver that serves a different Lissajous animation gif on every response
@@ -48,8 +53,31 @@ func lissajous(out io.Writer) {
 }
 
 func main() {
+	fmt.Println("Starting up server...")
+
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	server := &http.Server{Addr: ":8000"}
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			fmt.Printf("HTTP server ListenAndServe: %v\n", err)
+		}
+	}()
+
+	stopChan := make(chan os.Signal, 1)
+	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
+
+	<-stopChan
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	fmt.Println("Shutting down server...")
+	if err := server.Shutdown(ctx); err != nil {
+		fmt.Printf("HTTP server Shutdown Failed: %v\n", err)
+	} else {
+		fmt.Printf("HTTP server Shutdown Successfully\n")
+	}
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
