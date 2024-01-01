@@ -1,6 +1,6 @@
 # Personal Website Infrastructure
 
-This self contained project deploys a minimal set of AWS Infrastructure for hosting a personal website on an EC2 t2.nano instance with HTTPS. With the AWS free tier, hosting costs are around $40 per month.
+This self-contained project deploys AWS Infrastructure for hosting a personal website on an EC2 t2.nano instance with HTTPS. Hosting costs are around $40 per month, with 90% of that cost coming from the NAT Gateway.
 
 The demo Go server code included is taken from the book *The Go Programming Language* by Alan Donovan and Brian Kernighan.
 
