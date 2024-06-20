@@ -1,6 +1,6 @@
 # Personal Website Infrastructure
 
-This self-contained project deploys AWS Infrastructure for hosting a personal website on an EC2 t2.nano instance with HTTPS. Hosting costs are around $40 per month, with 90% of that cost coming from the NAT Gateway.
+This self-contained project deploys AWS Infrastructure for hosting a non-static personal website on an EC2 t2.nano instance with HTTPS.
 
 The demo Go server code included is taken from the book *The Go Programming Language* by Alan Donovan and Brian Kernighan.
 
@@ -12,12 +12,15 @@ The demo Go server code included is taken from the book *The Go Programming Lang
 
 The CDK directory contains two stacks: 
 
- - `PersonalWebsiteCertStack`, which provisions the following
+ - `CertStack`, which provisions the following
    - Route53 hosted zone
    - ACM Certificate for HTTPS
  
- - `PersonalWebsiteStack`, which provisions the following
+ - `VPCStack`, which provisions the following
    - VPC
+   - [fck-nat](https://fck-nat.dev/stable/) NAT Gateway (used over AWS managed NAT Gateway to save on costs)
+
+ - `PersonalWebsiteStack`, which provisions the following
    - ECS Cluster with a single t3.nano
    - EC2 Service with a single task
    - Application Load Balancer that requires HTTPS

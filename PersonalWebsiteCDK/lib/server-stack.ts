@@ -17,31 +17,25 @@ export interface PersonalWebsiteStackProps extends cdk.StackProps {
    * Certificate for HTTPS
    */
   readonly certificate: certmgr.Certificate;
+  /**
+   * VPC for the ECS cluster
+   */
+  readonly vpc: ec2.Vpc;
 }
 
 export class PersonalWebsiteStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: PersonalWebsiteStackProps) {
     super(scope, id, props);
 
-    // VPC for the ECS cluster
-    const vpc = new ec2.Vpc(this, 'PersonalWebsiteVPC', {
-      // Need at least two AZs to support an ALB
-      maxAzs: 2,
-      natGateways: 1,
-    });
-
-
-    // ECS Cluster that will run the dockerfile 
     const cluster = new ecs.Cluster(this, 'PersonalWebsiteCluster', {
-      vpc,
-      // Minimal capacity to keep costs low :)
+      vpc: props.vpc,
       capacity: {
         instanceType: new ec2.InstanceType('t3.nano'),
         minCapacity: 1,
-        maxCapacity: 1,
+        maxCapacity: 2,
       },
     });
-    // Container for the dockerfile holding your go server
+
     const taskDefinition = new ecs.Ec2TaskDefinition(this, 'PersonalWebsiteTask', {
       networkMode: ecs.NetworkMode.AWS_VPC,
 
@@ -64,7 +58,7 @@ export class PersonalWebsiteStack extends cdk.Stack {
       }],
     });
     const ecsSecurityGroup = new ec2.SecurityGroup(this, 'PersonalWebsiteSecurityGroup', {
-      vpc,
+      vpc: props.vpc,
       description: 'Allow access from load balancer to ECS cluster',
     });
     const service = new ecs.Ec2Service(this, 'PersonalWebsiteService', {
@@ -72,19 +66,14 @@ export class PersonalWebsiteStack extends cdk.Stack {
       taskDefinition: taskDefinition,
       securityGroups: [ecsSecurityGroup],
       desiredCount: 1,
-      // Each t2.Nano instance can only support a single task, due to ENI constraints.
-      // To be able to successfully deploy new task definitions to ECS,
-      // we need to allow ECS to spin down the current task, before spinning up a new one.
-      // If you want to avoid any downtime on deploys, you can spend more money 
-      // on a larger instance type and raise the minHealthyPercent to 100.  
-      minHealthyPercent: 0,
-      maxHealthyPercent: 100,
+      minHealthyPercent: 100,
+      maxHealthyPercent: 200,
       assignPublicIp: false,
     });
 
     // Load balancer that will send internet traffic to the ECS service 
     const lb = new elbv2.ApplicationLoadBalancer(this, 'PersonalWebsiteLoadBalancer', {
-      vpc,
+      vpc: props.vpc,
       internetFacing: true,
     });
     const lbSecurityGroup = lb.connections.securityGroups[0];
